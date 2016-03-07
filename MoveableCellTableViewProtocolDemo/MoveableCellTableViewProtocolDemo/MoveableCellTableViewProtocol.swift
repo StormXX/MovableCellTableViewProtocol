@@ -12,7 +12,7 @@ enum SnapShotStatus {
     case Origin
 }
 
-protocol MovableCellTableViewProtocol: class{
+protocol MoveableCellTableViewProtocol: class {
     // property for moving row
     var snapshot: UIView! { get set }
     var sourceIndexPath: NSIndexPath! { get set }
@@ -22,26 +22,26 @@ protocol MovableCellTableViewProtocol: class{
     var autoscrollDistance: CGFloat { get set }
     var autoscrollTimer: NSTimer? { get set }
     var isTableViewBelowNavigationBar: Bool { get set }
-    
+
     //extension protocol
     func addMoveCellForTableView()
     func handleLongPressGesture(recognizer: UIGestureRecognizer)
     func autoscrollTimerFired(timer: NSTimer)
-    
+
     //for implement
     func longPressGestureAction(recognizer: UIGestureRecognizer)
     func moveableCellTableView(tableView: UITableView, moveRowAtIndexPath sourceIndexPath: NSIndexPath, toIndexPath destinationIndexPath: NSIndexPath)
     func autoscrollTimerAction(timer: NSTimer)
 }
 
-extension MovableCellTableViewProtocol where Self:UIViewController {
-    
+extension MoveableCellTableViewProtocol where Self:UIViewController {
+
     func addMoveCellForTableView() {
         guard let tableView = self.valueForKey("tableView") as? UITableView else { return }
         movingRowGesture = UILongPressGestureRecognizer(target: self, action: "longPressGestureAction:")
         tableView.addGestureRecognizer(movingRowGesture)
     }
-    
+
     func handleLongPressGesture(recognizer: UIGestureRecognizer) {
         guard let tableView = self.valueForKey("tableView") as? UITableView else { return }
         let positionInTableView = recognizer.locationInView(tableView)
@@ -51,14 +51,14 @@ extension MovableCellTableViewProtocol where Self:UIViewController {
         case .Changed:
             moveSnapshotToPosition(positionInTableView)
             autoScrollInTableView(tableView, position: positionInTableView)
-            if (autoscrollDistance == 0) {
+            if autoscrollDistance == 0 {
                 moveRowInTableView(tableView, toPosition: positionInTableView)
             }
         default:
             endMovingRowInTableView(tableView)
         }
     }
-    
+
     //MARK: - moving row help method
     func startMovingRowInTableView(tableView: UITableView, position: CGPoint) {
         guard let indexPath = tableView.indexPathForRowAtPoint(position), cell = tableView.cellForRowAtIndexPath(indexPath) else { return }
@@ -74,13 +74,13 @@ extension MovableCellTableViewProtocol where Self:UIViewController {
         sourceIndexPath = indexPath
         lastPosition = position
     }
-    
+
     func moveSnapshotToPosition(position: CGPoint) {
         let deltaY = position.y - lastPosition.y
         snapshot.center.y += deltaY
         lastPosition = position
     }
-    
+
     func moveRowInTableView(tableView: UITableView, toPosition position: CGPoint) {
         guard let indexPath = tableView.indexPathForRowAtPoint(position) else { return }
         if indexPath != sourceIndexPath {
@@ -95,7 +95,7 @@ extension MovableCellTableViewProtocol where Self:UIViewController {
             sourceIndexPath = indexPath
         }
     }
-    
+
     func endMovingRowInTableView(tableView: UITableView) {
         stopAutoscroll()
         guard let cell = tableView.cellForRowAtIndexPath(sourceIndexPath) else { return }
@@ -109,7 +109,7 @@ extension MovableCellTableViewProtocol where Self:UIViewController {
         }
         sourceIndexPath = nil
     }
-    
+
     func updateSnapshot(status: SnapShotStatus) {
         switch status {
         case .Moving:
@@ -118,21 +118,20 @@ extension MovableCellTableViewProtocol where Self:UIViewController {
             snapshot.alpha = 1.0
         }
     }
-    
+
     //MARK: - auto scroll tableview help method
     func autoScrollInTableView(tableView: UITableView, position: CGPoint) {
         func canScroll() -> Bool {
             return (CGRectGetHeight(tableView.frame) + deltaTableViewContentOffSet()) < tableView.contentSize.height
         }
-        
+
         func determineAutoscrollDistanceForSnapShot() {
             autoscrollDistance = 0
-            
+
             if canScroll() && CGRectIntersectsRect(snapshot.frame, tableView.bounds) {
                 let distanceToTopEdge = CGRectGetMinY(snapshot.frame) - (CGRectGetMinY(tableView.bounds) - deltaTableViewContentOffSet())
                 let distanceToBottomEdge = CGRectGetMaxY(tableView.bounds) - CGRectGetMaxY(snapshot.frame)
-//                print("distanceToTopEdge \(distanceToTopEdge) distanceToBottomEdge \(distanceToBottomEdge)")
-                
+
                 if distanceToTopEdge < 0 {
                     autoscrollDistance = CGFloat(ceilf(Float(distanceToTopEdge / 5.0)))
                 } else if distanceToBottomEdge < 0 {
@@ -140,9 +139,9 @@ extension MovableCellTableViewProtocol where Self:UIViewController {
                 }
             }
         }
-        
+
         determineAutoscrollDistanceForSnapShot()
-        
+
         if autoscrollDistance == 0 {
             guard let timer = autoscrollTimer else { return }
             timer.invalidate()
@@ -151,38 +150,33 @@ extension MovableCellTableViewProtocol where Self:UIViewController {
             autoscrollTimer = NSTimer.scheduledTimerWithTimeInterval((1.0 / 60.0), target: self, selector: "autoscrollTimerAction:", userInfo: nil, repeats: true)
         }
     }
-    
+
     func autoscrollTimerFired(timer: NSTimer) {
         guard let tableView = self.valueForKey("tableView") as? UITableView else { return }
         func legalizeAutoscrollDistance() {
             let minimumLegalizeDistance = (tableView.contentOffset.y - deltaTableViewContentOffSet()) * -1.0
             let maximumLegalizeDistance = tableView.contentSize.height - ((CGRectGetHeight(tableView.frame) + deltaTableViewContentOffSet()) + (tableView.contentOffset.y - deltaTableViewContentOffSet()))
-//            print("***********")
-//            print("befor autoscrollDistance \(autoscrollDistance)")
             autoscrollDistance = max(autoscrollDistance, minimumLegalizeDistance)
             autoscrollDistance = min(autoscrollDistance, maximumLegalizeDistance)
-//            print("after autoscrollDistance \(autoscrollDistance)")
-//            print("minimumLegalizeDistance \(minimumLegalizeDistance)")
-//            print("maximumLegalizeDistance \(maximumLegalizeDistance)")
         }
-        
+
         legalizeAutoscrollDistance()
-        
+
         tableView.contentOffset.y += autoscrollDistance
         snapshot.frame.origin.y += autoscrollDistance
-        
+
         let position = movingRowGesture.locationInView(tableView)
         lastPosition = position
         moveRowInTableView(tableView, toPosition: position)
     }
-    
+
     func stopAutoscroll() {
         autoscrollDistance = 0
         guard let timer = autoscrollTimer else { return }
         timer.invalidate()
         autoscrollTimer = nil
     }
-    
+
     func deltaTableViewContentOffSet() -> CGFloat {
         guard isTableViewBelowNavigationBar else { return 0.0 }
         let orientation = UIApplication.sharedApplication().statusBarOrientation
@@ -197,20 +191,20 @@ extension MovableCellTableViewProtocol where Self:UIViewController {
 extension UITableViewCell {
     var snapshot: UIView {
         get {
-            UIGraphicsBeginImageContextWithOptions(self.bounds.size, false, 0);
+            UIGraphicsBeginImageContextWithOptions(self.bounds.size, false, 0)
             self.layer.renderInContext(UIGraphicsGetCurrentContext()!)
             let image = UIGraphicsGetImageFromCurrentImageContext()
-            UIGraphicsEndImageContext();
-            
+            UIGraphicsEndImageContext()
+
             let snapshot = UIImageView(image: image)
             let layer = snapshot.layer
-            layer.shadowOffset = CGSizeMake(-5.0, 0.0);
-            layer.shadowRadius = 5.0;
-            layer.shadowOpacity = 0.4;
-            return snapshot;
+            layer.shadowOffset = CGSize(width: -5.0, height: 0.0)
+            layer.shadowRadius = 5.0
+            layer.shadowOpacity = 0.4
+            return snapshot
         }
     }
-    
+
     func toggleMoving(moving: Bool) {
         let alpha: CGFloat = moving ? 0.0 : 1.0
         self.contentView.alpha = alpha

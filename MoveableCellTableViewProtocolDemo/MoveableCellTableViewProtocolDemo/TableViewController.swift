@@ -52,7 +52,7 @@ class TableViewController: UITableViewController {
     }
 }
 
-extension TableViewController: MovableCellTableViewProtocol {
+extension TableViewController: MoveableCellTableViewProtocol {
     func longPressGestureAction(recognizer: UIGestureRecognizer) {
         handleLongPressGesture(recognizer)
     }
