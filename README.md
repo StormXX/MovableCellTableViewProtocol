@@ -10,6 +10,7 @@ call the `addMoveCellForTableView()` in viewDidLoad() and call the `cell.toggleM
 // property for moving row
 var snapshot: UIView!
 var sourceIndexPath: NSIndexPath!
+var originIndexPath: NSIndexPath!
 var lastPosition: CGPoint!
 var movingRowGesture: UILongPressGestureRecognizer!
 // property for tableview auto scroll
@@ -32,6 +33,10 @@ func autoscrollTimerAction(timer: NSTimer) {
 func moveableCellTableView(tableView: UITableView, moveRowAtIndexPath sourceIndexPath: NSIndexPath, toIndexPath destinationIndexPath: NSIndexPath) {
     // exchange data code here
 }
+
+func moveableCellTableView(tableView: UITableView, didEndMoveRowAtIndexPath originIndexPath: NSIndexPath, toIndexPath destinationIndexPath: NSIndexPath) {
+    // end move handle
+    }
 ```
 
 > Because of selector in protocol extension is not supported, so you have to implement the longPressGestureAction(\_:) and autoscrollTimerAction(\_:) and call the handleLongPressGesture(\_:) and autoscrollTimerFired(\_:). If you have a better solution for it, please pull request.

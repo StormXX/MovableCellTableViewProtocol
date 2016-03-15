@@ -15,6 +15,7 @@ enum SnapShotStatus {
 protocol MoveableCellTableViewProtocol: class {
     // property for moving row
     var snapshot: UIView! { get set }
+    var originIndexPath: NSIndexPath! { get set}
     var sourceIndexPath: NSIndexPath! { get set }
     var lastPosition: CGPoint! { get set }
     var movingRowGesture: UILongPressGestureRecognizer! { get set }
@@ -30,8 +31,9 @@ protocol MoveableCellTableViewProtocol: class {
 
     //for implement
     func longPressGestureAction(recognizer: UIGestureRecognizer)
-    func moveableCellTableView(tableView: UITableView, moveRowAtIndexPath sourceIndexPath: NSIndexPath, toIndexPath destinationIndexPath: NSIndexPath)
     func autoscrollTimerAction(timer: NSTimer)
+    func moveableCellTableView(tableView: UITableView, moveRowAtIndexPath sourceIndexPath: NSIndexPath, toIndexPath destinationIndexPath: NSIndexPath)
+    func moveableCellTableView(tableView: UITableView, didEndMoveRowAtIndexPath originIndexPath: NSIndexPath, toIndexPath destinationIndexPath: NSIndexPath)
 }
 
 extension MoveableCellTableViewProtocol where Self:UIViewController {
@@ -72,6 +74,7 @@ extension MoveableCellTableViewProtocol where Self:UIViewController {
             cell.toggleMoving(true)
         }
         sourceIndexPath = indexPath
+        originIndexPath = indexPath
         lastPosition = position
     }
 
@@ -99,6 +102,7 @@ extension MoveableCellTableViewProtocol where Self:UIViewController {
     func endMovingRowInTableView(tableView: UITableView) {
         stopAutoscroll()
         guard let cell = tableView.cellForRowAtIndexPath(sourceIndexPath) else { return }
+        moveableCellTableView(tableView, didEndMoveRowAtIndexPath: originIndexPath, toIndexPath: sourceIndexPath)
         UIView.animateWithDuration(0.33, animations: { [unowned self]() -> Void in
             self.snapshot.center = cell.center
             self.snapshot.alpha = 0
@@ -108,6 +112,7 @@ extension MoveableCellTableViewProtocol where Self:UIViewController {
                 self.snapshot = nil
         }
         sourceIndexPath = nil
+        originIndexPath = nil
     }
 
     func updateSnapshot(status: SnapShotStatus) {

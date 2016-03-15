@@ -85,6 +85,7 @@
 				EBFDE3AA1C8C2DF100730D41 /* Sources */,
 				EBFDE3AB1C8C2DF100730D41 /* Frameworks */,
 				EBFDE3AC1C8C2DF100730D41 /* Resources */,
+				EB5CBEEF1C97FE1700579869 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -140,6 +141,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		EB5CBEEF1C97FE1700579869 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cp MoveableCellTableViewProtocolDemo/MoveableCellTableViewProtocol.swift ../Protocol/";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		EBFDE3AA1C8C2DF100730D41 /* Sources */ = {

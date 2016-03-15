@@ -17,6 +17,7 @@ class TableViewController: UITableViewController {
     // property for moving row
     var snapshot: UIView!
     var sourceIndexPath: NSIndexPath!
+    var originIndexPath: NSIndexPath!
     var lastPosition: CGPoint!
     var movingRowGesture: UILongPressGestureRecognizer!
     // property for tableview auto scroll
@@ -60,10 +61,15 @@ extension TableViewController: MoveableCellTableViewProtocol {
     func autoscrollTimerAction(timer: NSTimer) {
         autoscrollTimerFired(timer)
     }
-    
+
     func moveableCellTableView(tableView: UITableView, moveRowAtIndexPath sourceIndexPath: NSIndexPath, toIndexPath destinationIndexPath: NSIndexPath) {
         let originData = dataArray[sourceIndexPath.row]
         dataArray.removeAtIndex(sourceIndexPath.row)
         dataArray.insert(originData, atIndex: destinationIndexPath.row)
     }
+
+    func moveableCellTableView(tableView: UITableView, didEndMoveRowAtIndexPath originIndexPath: NSIndexPath, toIndexPath destinationIndexPath: NSIndexPath) {
+    }
+    
+    
 }
