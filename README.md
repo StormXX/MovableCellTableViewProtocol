@@ -1,5 +1,6 @@
 # MovableCellTableViewProtocol
 A Swift Protocol Extension For Moveable Cell TableView
+> if you use Xcode7.3 and Swift 2.2 please use branch "swift2.2" and change the type of `lastPosition` to NSValue!
 
 ###Usage
 
@@ -11,7 +12,7 @@ call the `addMoveCellForTableView()` in viewDidLoad() and call the `cell.toggleM
 var snapshot: UIView!
 var sourceIndexPath: NSIndexPath!
 var originIndexPath: NSIndexPath!
-var lastPosition: CGPoint!
+var lastPosition: NSValue!
 var movingRowGesture: UILongPressGestureRecognizer!
 // property for tableview auto scroll
 var autoscrollDistance: CGFloat = 0

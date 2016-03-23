@@ -18,7 +18,7 @@ class TableViewController: UITableViewController {
     var snapshot: UIView!
     var sourceIndexPath: NSIndexPath!
     var originIndexPath: NSIndexPath!
-    var lastPosition: CGPoint!
+    var lastPosition: NSValue!
     var movingRowGesture: UILongPressGestureRecognizer!
     // property for tableview auto scroll
     var autoscrollDistance: CGFloat = 0
