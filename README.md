@@ -1,5 +1,6 @@
 # MovableCellTableViewProtocol
 A Swift Protocol Extension For Moveable Cell TableView
+> if you use Xcode7.3 and Swift 2.2 please use branch "swift2.2" and change the type of `lastPosition` to NSValue!
 
 ###Usage
 
