@@ -24,21 +24,18 @@ enum SnapShotStatus {
     var autoscrollTimer: Timer? { get set }
     var isTableViewBelowNavigationBar: Bool { get set }
     
-    //    //extension protocol
-    //    @objc optional func addMoveCellForTableView()
-    //    @objc optional func handleLongPressGesture(_ recognizer: UIGestureRecognizer)
-    //    @objc optional func autoscrollTimerFired(_ timer: Timer)
-    
-    //for implement
+    // for implement
     @objc func longPressGestureAction(_ recognizer: UIGestureRecognizer)
     @objc func autoscrollTimerAction(_ timer: Timer)
-    func moveableCellTableView(_ tableView: UITableView, moveRowAtIndexPath sourceIndexPath: IndexPath, toIndexPath destinationIndexPath: IndexPath)
-    func moveableCellTableView(_ tableView: UITableView, didEndMoveRowAtIndexPath originIndexPath: IndexPath, toIndexPath destinationIndexPath: IndexPath)
-    func moveableCellTableView(_ tableView: UITableView, canMoveRowAtIndexPath indexPath: IndexPath) -> Bool
+    func moveableCellTableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath)
+    func moveableCellTableView(_ tableView: UITableView, didEndMoveRowAt originIndexPath: IndexPath, to destinationIndexPath: IndexPath)
+    func moveableCellTableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool
+    func moveableCellTableView(_ tableView: UITableView, shouldMoveRowAt indexPath: IndexPath, to destinationIndexPath: IndexPath) -> Bool
+    func moveableCellTableView(_ tableView: UITableView, snapshotStartMovingAnimation snapshot: UIView)
+    func moveableCellTableView(_ tableView: UITableView, snapshotEndMovingAnimation snapshot: UIView)
 }
 
 extension MoveableCellTableViewProtocol where Self:UIViewController {
-    
     func addMoveCellForTableView() {
         guard let tableView = self.value(forKey: "tableView") as? UITableView else { return }
         movingRowGesture = UILongPressGestureRecognizer(target: self, action: #selector(MoveableCellTableViewProtocol.longPressGestureAction(_:)))
@@ -50,30 +47,33 @@ extension MoveableCellTableViewProtocol where Self:UIViewController {
         let positionInTableView = recognizer.location(in: tableView)
         switch recognizer.state {
         case .began:
-            guard let indexPath = tableView.indexPathForRow(at: positionInTableView), self.moveableCellTableView(tableView, canMoveRowAtIndexPath: indexPath) else { return }
+            guard let indexPath = tableView.indexPathForRow(at: positionInTableView), self.moveableCellTableView(tableView, canMoveRowAt: indexPath) else { return }
             startMovingRowInTableView(tableView, position: positionInTableView)
         case .changed:
+            guard snapshot != nil else { return }
             moveSnapshotToPosition(positionInTableView)
             autoScrollInTableView(tableView, position: positionInTableView)
             if autoscrollDistance == 0 {
                 moveRowInTableView(tableView, toPosition: positionInTableView)
             }
         default:
+            guard snapshot != nil else { return }
             endMovingRowInTableView(tableView)
         }
     }
     
-    //MARK: - moving row help method
+    // MARK: - moving row help method
     func startMovingRowInTableView(_ tableView: UITableView, position: CGPoint) {
-        guard let indexPath = tableView.indexPathForRow(at: position), let cell = tableView.cellForRow(at: indexPath) else { return }
+        guard let indexPath = tableView.indexPathForRow(at: position), let cell = tableView.cellForRow(at: indexPath), let moveableCell = cell as? MoveableCell else { return }
         cell.isSelected = false
         cell.isHighlighted = false
-        snapshot = cell.snapshot
+        snapshot = moveableCell.moveableSnapshot
         snapshot.center = cell.center
         tableView.addSubview(snapshot)
+        moveableCell.toggleMoving(true)
         UIView.animate(withDuration: 0.33, animations: {
             self.updateSnapshot(.moving)
-            cell.toggleMoving(true)
+            self.moveableCellTableView(tableView, snapshotStartMovingAnimation: self.snapshot)
         })
         sourceIndexPath = indexPath
         originIndexPath = indexPath
@@ -81,21 +81,21 @@ extension MoveableCellTableViewProtocol where Self:UIViewController {
     }
     
     func moveSnapshotToPosition(_ position: CGPoint) {
-        guard let _ = snapshot else { return }
+        guard snapshot != nil else { return }
         let deltaY = position.y - lastPosition.cgPointValue.y
         snapshot.center.y += deltaY
         lastPosition = NSValue(cgPoint: position)
     }
     
     func moveRowInTableView(_ tableView: UITableView, toPosition position: CGPoint) {
-        guard let indexPath = tableView.indexPathForRow(at: position), let _ = snapshot else { return }
+        guard let indexPath = tableView.indexPathForRow(at: position), snapshot != nil && moveableCellTableView(tableView, shouldMoveRowAt: sourceIndexPath, to: indexPath) else { return }
         if indexPath != sourceIndexPath {
-            self.moveableCellTableView(tableView, moveRowAtIndexPath: sourceIndexPath, toIndexPath: indexPath)
+            self.moveableCellTableView(tableView, moveRowAt: sourceIndexPath, to: indexPath)
             tableView.beginUpdates()
             tableView.deleteRows(at: [sourceIndexPath], with: .fade)
             tableView.insertRows(at: [indexPath], with: .fade)
             tableView.endUpdates()
-            if let cell = tableView.cellForRow(at: indexPath) {
+            if let cell = tableView.cellForRow(at: indexPath) as? MoveableCell {
                 cell.toggleMoving(true)
             }
             sourceIndexPath = indexPath
@@ -104,18 +104,19 @@ extension MoveableCellTableViewProtocol where Self:UIViewController {
     
     func endMovingRowInTableView(_ tableView: UITableView) {
         stopAutoscroll()
-        guard let cell = tableView.cellForRow(at: sourceIndexPath), let _ = snapshot else { return }
-        moveableCellTableView(tableView, didEndMoveRowAtIndexPath: originIndexPath, toIndexPath: sourceIndexPath)
+        guard let cell = tableView.cellForRow(at: sourceIndexPath), snapshot != nil, let moveableCell = cell as? MoveableCell else { return }
         UIView.animate(withDuration: 0.33, animations: {
             self.snapshot.center = cell.center
+            self.moveableCellTableView(tableView, snapshotEndMovingAnimation: self.snapshot)
+        }, completion: { (_) -> Void in
+            moveableCell.toggleMoving(false)
             self.snapshot.alpha = 0
-            cell.toggleMoving(false)
-            }, completion: { (finished) -> Void in
-                self.snapshot.removeFromSuperview()
-                self.snapshot = nil
+            self.snapshot.removeFromSuperview()
+            self.snapshot = nil
+            self.moveableCellTableView(tableView, didEndMoveRowAt: self.originIndexPath, to: self.sourceIndexPath)
+            self.sourceIndexPath = nil
+            self.originIndexPath = nil
         })
-        sourceIndexPath = nil
-        originIndexPath = nil
     }
     
     func updateSnapshot(_ status: SnapShotStatus) {
@@ -127,7 +128,7 @@ extension MoveableCellTableViewProtocol where Self:UIViewController {
         }
     }
     
-    //MARK: - auto scroll tableview help method
+    // MARK: - auto scroll tableview help method
     func autoScrollInTableView(_ tableView: UITableView, position: CGPoint) {
         func canScroll() -> Bool {
             return (tableView.frame.height + deltaTableViewContentOffSet()) < tableView.contentSize.height
@@ -196,21 +197,24 @@ extension MoveableCellTableViewProtocol where Self:UIViewController {
     }
 }
 
-extension UITableViewCell {
-    var snapshot: UIView {
-        get {
-            UIGraphicsBeginImageContextWithOptions(self.bounds.size, false, 0)
-            self.layer.render(in: UIGraphicsGetCurrentContext()!)
-            let image = UIGraphicsGetImageFromCurrentImageContext()
-            UIGraphicsEndImageContext()
-            
-            let snapshot = UIImageView(image: image)
-            let layer = snapshot.layer
-            layer.shadowOffset = CGSize(width: -5.0, height: 0.0)
-            layer.shadowRadius = 5.0
-            layer.shadowOpacity = 0.4
-            return snapshot
-        }
+protocol MoveableCell: class {
+    var moveableSnapshot: UIView { get }
+    func toggleMoving(_ moving: Bool)
+}
+
+extension MoveableCell where Self:UITableViewCell {
+    var moveableSnapshot: UIView {
+        UIGraphicsBeginImageContextWithOptions(self.bounds.size, false, 0)
+        self.layer.render(in: UIGraphicsGetCurrentContext()!)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        let snapshot = UIImageView(image: image)
+        let layer = snapshot.layer
+        layer.shadowOffset = CGSize(width: -5.0, height: 0.0)
+        layer.shadowRadius = 5.0
+        layer.shadowOpacity = 0.4
+        return snapshot
     }
     
     func toggleMoving(_ moving: Bool) {

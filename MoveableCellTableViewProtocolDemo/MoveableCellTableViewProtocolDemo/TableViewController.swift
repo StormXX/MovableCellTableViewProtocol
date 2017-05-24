@@ -47,11 +47,14 @@ class TableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
-        cell.toggleMoving(false)
-        cell.textLabel?.text = dataArray[(indexPath as NSIndexPath).row]
-        cell.accessoryType = .disclosureIndicator
-        return cell
+        if let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as? TableViewCell {
+            cell.toggleMoving(false)
+            cell.textLabel?.text = dataArray[(indexPath as NSIndexPath).row]
+            cell.accessoryType = .disclosureIndicator
+            return cell
+        } else {
+            return UITableViewCell()
+        }
     }
 }
 
@@ -64,17 +67,26 @@ extension TableViewController: MoveableCellTableViewProtocol {
         autoscrollTimerFired(timer)
     }
 
-    func moveableCellTableView(_ tableView: UITableView, moveRowAtIndexPath sourceIndexPath: IndexPath, toIndexPath destinationIndexPath: IndexPath) {
+    func moveableCellTableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         let originData = dataArray[(sourceIndexPath as NSIndexPath).row]
         dataArray.remove(at: (sourceIndexPath as NSIndexPath).row)
         dataArray.insert(originData, at: (destinationIndexPath as NSIndexPath).row)
     }
 
-    func moveableCellTableView(_ tableView: UITableView, didEndMoveRowAtIndexPath originIndexPath: IndexPath, toIndexPath destinationIndexPath: IndexPath) {
+    func moveableCellTableView(_ tableView: UITableView, didEndMoveRowAt originIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
     }
 
-    func moveableCellTableView(_ tableView: UITableView, canMoveRowAtIndexPath indexPath: IndexPath) -> Bool {
+    func moveableCellTableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
         return true
     }
-    
+
+    func moveableCellTableView(_ tableView: UITableView, shouldMoveRowAt indexPath: IndexPath, to destinationIndexPath: IndexPath) -> Bool {
+        return true
+    }
+
+    func moveableCellTableView(_ tableView: UITableView, snapshotStartMovingAnimation snapshot: UIView) {
+    }
+
+    func moveableCellTableView(_ tableView: UITableView, snapshotEndMovingAnimation snapshot: UIView) {
+    }
 }

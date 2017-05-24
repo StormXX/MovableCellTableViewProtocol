@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		EB09DF161C8D257F004840D7 /* MoveableCellTableViewProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB09DF151C8D257F004840D7 /* MoveableCellTableViewProtocol.swift */; };
+		EB84B1AB1ED55E1A00CC98F7 /* TableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB84B1AA1ED55E1A00CC98F7 /* TableViewCell.swift */; };
 		EBFDE3B21C8C2DF100730D41 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBFDE3B11C8C2DF100730D41 /* AppDelegate.swift */; };
 		EBFDE3B71C8C2DF100730D41 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EBFDE3B51C8C2DF100730D41 /* Main.storyboard */; };
 		EBFDE3B91C8C2DF100730D41 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EBFDE3B81C8C2DF100730D41 /* Assets.xcassets */; };
@@ -17,6 +18,7 @@
 
 /* Begin PBXFileReference section */
 		EB09DF151C8D257F004840D7 /* MoveableCellTableViewProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoveableCellTableViewProtocol.swift; sourceTree = "<group>"; };
+		EB84B1AA1ED55E1A00CC98F7 /* TableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewCell.swift; sourceTree = "<group>"; };
 		EBFDE3AE1C8C2DF100730D41 /* MoveableCellTableViewProtocolDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoveableCellTableViewProtocolDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EBFDE3B11C8C2DF100730D41 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		EBFDE3B61C8C2DF100730D41 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -59,6 +61,7 @@
 				EBFDE3C51C8C2E2400730D41 /* Protocol */,
 				EBFDE3B11C8C2DF100730D41 /* AppDelegate.swift */,
 				EBFDE3C31C8C2E1F00730D41 /* TableViewController.swift */,
+				EB84B1AA1ED55E1A00CC98F7 /* TableViewCell.swift */,
 				EBFDE3B51C8C2DF100730D41 /* Main.storyboard */,
 				EBFDE3B81C8C2DF100730D41 /* Assets.xcassets */,
 				EBFDE3BA1C8C2DF100730D41 /* LaunchScreen.storyboard */,
@@ -165,6 +168,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EBFDE3B21C8C2DF100730D41 /* AppDelegate.swift in Sources */,
+				EB84B1AB1ED55E1A00CC98F7 /* TableViewCell.swift in Sources */,
 				EBFDE3C41C8C2E1F00730D41 /* TableViewController.swift in Sources */,
 				EB09DF161C8D257F004840D7 /* MoveableCellTableViewProtocol.swift in Sources */,
 			);
