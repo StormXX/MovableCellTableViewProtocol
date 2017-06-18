@@ -1,5 +1,8 @@
-# MovableCellTableViewProtocol
+# MoveableCellTableViewProtocol
 🔨A Swift Protocol Extension For Moveable Cell TableView
+
+### GIF
+![image](https://raw.githubusercontent.com/StormXX/MoveableCellTableViewProtocol/master/GIF/MoveableCellTableViewProtocol.gif)
 
 ### Usage
 
@@ -11,7 +14,7 @@
 
 #### Implement Properties
 ```
-// MARK: - MovableCellTableViewProtocol Property
+// MARK: - MoveableCellTableViewProtocol Property
 // property for moving row
 var snapshot: UIView!
 var sourceIndexPath: IndexPath!

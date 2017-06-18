@@ -45,6 +45,10 @@ class TableViewController: UITableViewController {
         return dataArray.count
     }
 
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 60
+    }
+
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as? TableViewCell {
             cell.textLabel?.text = dataArray[(indexPath as NSIndexPath).row]
