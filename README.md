@@ -1,10 +1,10 @@
 # MoveableCellTableViewProtocol
 🔨A Swift Protocol Extension For Moveable Cell TableView
 
-### GIF
+## GIF
 ![image](https://raw.githubusercontent.com/StormXX/MoveableCellTableViewProtocol/master/GIF/MoveableCellTableViewProtocol.gif)
 
-### Usage
+## Usage
 
 1. Implement the extension properties in your UIViewController which has a UITableView to move cell.
 2. Call the `addMoveCellForTableView()` in `viewDidLoad()` to initialize some  configuration for the UITableView.
@@ -66,7 +66,7 @@ func moveableCellTableView(_ tableView: UITableView, snapshotEndMovingAnimation 
 
 > Because of selector in protocol extension is not supported, so you have to implement the `longPressGestureAction(\_:)` and `autoscrollTimerAction(\_:)` and call the `handleLongPressGesture(\_:)` and `autoscrollTimerFired(\_:)`. If you have a better solution for it, please pull request.
 
-### Customize
+## Customize
 You can customize your snapshot in the UITableViewCell.
 
 ```
